@@ -8,7 +8,7 @@ typedef struct Player
 	float speed;
 	float points;
 	int time;
-}Player;
+} Player;
 
 void _Player_Default(struct Player *self, POINT frame)
 {
@@ -29,11 +29,11 @@ typedef struct Board
 	int cycle;
 	int custom;
 	
-	BOOL(*CreateMap)(struct Board *self, struct Graphics *graphics);
-	BOOL(*CustomMap)(struct Board *self, struct Player *player, struct Graphics *graphics);
+	BOOL(*CreateMap)(struct Board *self, Graphics_t *graphics);
+	BOOL(*CustomMap)(struct Board *self, struct Player *player, Graphics_t *graphics);
 	void(*Shutdown)(struct Board *self);
-	void(*Print)(struct Board *self, struct Player *player, struct Graphics *graphics);
-}Board;
+	void(*Print)(struct Board *self, struct Player *player, Graphics_t *graphics);
+} Board_t;
 
 void gotoxy(int x, int y)
 {
@@ -50,18 +50,18 @@ void draw(char *d)
 	return;
 }
 
-void _Board_Print(struct Board *self, struct Player *player, struct Graphics *graphics)
+void _Board_Print(Board_t *self, struct Player *player, Graphics_t *graphics)
 {
 	strcpy(self->map, self->mapB);
-	self->map[(player->poss.y + player->shape[0].y) * (self->frame.x + 1) + player->poss.x + player->shape[0].x] = graphics->kursor;
-	self->map[(player->poss.y + player->shape[1].y) * (self->frame.x + 1) + player->poss.x + player->shape[1].x] = graphics->kursor;
-	self->map[(player->poss.y + player->shape[2].y) * (self->frame.x + 1) + player->poss.x + player->shape[2].x] = graphics->kursor;
-	self->map[(player->poss.y + player->shape[3].y) * (self->frame.x + 1) + player->poss.x + player->shape[3].x] = graphics->kursor;
+	self->map[(player->poss.y + player->shape[0].y) * (self->frame.x + 1) + player->poss.x + player->shape[0].x] = graphics->board.kursor;
+	self->map[(player->poss.y + player->shape[1].y) * (self->frame.x + 1) + player->poss.x + player->shape[1].x] = graphics->board.kursor;
+	self->map[(player->poss.y + player->shape[2].y) * (self->frame.x + 1) + player->poss.x + player->shape[2].x] = graphics->board.kursor;
+	self->map[(player->poss.y + player->shape[3].y) * (self->frame.x + 1) + player->poss.x + player->shape[3].x] = graphics->board.kursor;
 	draw(self->map);
 	return;
 }
 
-void _Board_Shutdown(struct Board *self)
+void _Board_Shutdown(Board_t *self)
 {
 	free(self->mapB);
 	free(self->map);
@@ -69,7 +69,7 @@ void _Board_Shutdown(struct Board *self)
 	self->mapB = NULL;
 }
 
-BOOL _Board_CreateMap(struct Board *self, struct Graphics *graphics)
+BOOL _Board_CreateMap(Board_t *self, Graphics_t *graphics)
 {
 	void *tmp = NULL;
 	if (self->frame.x * self->frame.y == 0) return FALSE;
@@ -90,21 +90,21 @@ BOOL _Board_CreateMap(struct Board *self, struct Graphics *graphics)
 		int w = 0;
 		for (; i < self->frame.x; ++i)
 		{
-			self->map[i] = graphics->ramka;
+			self->map[i] = graphics->board.ramka;
 		}
 		for (self->map[i] = '\n', ++i; i < (((self->frame.x + 1)*self->frame.y) - (self->frame.x + 1)); ++i)
 		{
-			self->map[i] = graphics->ramka;
+			self->map[i] = graphics->board.ramka;
 			for (w = 0, ++i; w < self->frame.x - 2; w++, ++i)
 			{
-				self->map[i] = graphics->background;
+				self->map[i] = graphics->board.background;
 			}
-			self->map[i] = graphics->ramka;
+			self->map[i] = graphics->board.ramka;
 			self->map[++i] = '\n';
 		}
 		for (; i < ((self->frame.x + 1)*self->frame.y) - 1; ++i)
 		{
-			self->map[i] = graphics->ramka;
+			self->map[i] = graphics->board.ramka;
 		}
 		self->map[i] = '\n';
 		self->map[++i] = '\0';
@@ -113,11 +113,11 @@ BOOL _Board_CreateMap(struct Board *self, struct Graphics *graphics)
 		strcpy(self->mapB, self->map);
 		return TRUE;
 	}
-	_putch(8);
+	putchar(8);
 	return FALSE;
 }
 
-BOOL _Board_CustomMap(struct Board *self, struct Player *player, struct Graphics *graphics)
+BOOL _Board_CustomMap(Board_t *self, struct Player *player, Graphics_t *graphics)
 {
 	struct Kursor kursor;
 	struct Sterowanie controls;
@@ -139,8 +139,8 @@ BOOL _Board_CustomMap(struct Board *self, struct Player *player, struct Graphics
 		system("cls");
 		printf("Wynik gry niestandardowej nie jest zapisywany na tablicy wynik\242w.\n UWAGA! okno konsoli nie mo\276e by\206 \nwi\251ksze ni\276 ekran. Powoduje to \nb\210\251de wy\230wietlanie zbyt du\276ych map\n\n");
 		ilosc = 0;
-		printf("%cX: %d\n", graphics->lewy * !(kursor.pozycja - ilosc), x); ilosc++;
-		printf("%cY: %d\n", graphics->lewy * !(kursor.pozycja - ilosc), y); ilosc++;
+		printf("%cX: %d\n", graphics->chars.lewy * !(kursor.pozycja - ilosc), x); ilosc++;
+		printf("%cY: %d\n", graphics->chars.lewy * !(kursor.pozycja - ilosc), y); ilosc++;
 		if (controls.utilities.esc.isDown)
 		{
 			self->Shutdown(self);
@@ -224,7 +224,7 @@ BOOL _Board_CustomMap(struct Board *self, struct Player *player, struct Graphics
 	return TRUE;
 }
 
-void _Board_Initilaze(struct Board *self)
+void _Board_Initilaze(Board_t *self)
 {
 	self->frame.x = 0;
 	self->frame.y = 0;
@@ -255,7 +255,7 @@ int sumaC(int a, int b)
 	return a + sumaC(a + a, b - 1);
 }
 
-void zapis(char *w, Player *player, POINT frame, struct Graphics *graphics)
+void zapis(char *w, Player *player, POINT frame, Graphics_t *graphics)
 {
 	int i = 0;
 	char trans = 0;
@@ -266,9 +266,9 @@ void zapis(char *w, Player *player, POINT frame, struct Graphics *graphics)
 
 	for (i = 0; *(w + i); i++)
 	{
-		if (*(w + i) == graphics->background) trans = 't';
-		else if (*(w + i) == graphics->ustawione) trans = 'u';
-		else if (*(w + i) == graphics->ramka) trans = 'r';
+		if (*(w + i) == graphics->board.background) trans = 't';
+		else if (*(w + i) == graphics->board.ustawione) trans = 'u';
+		else if (*(w + i) == graphics->board.ramka) trans = 'r';
 		else trans = *(w + i);
 		fprintf(zapisz, "%c", trans);
 	}
@@ -297,7 +297,7 @@ void zapis(char *w, Player *player, POINT frame, struct Graphics *graphics)
 	return;
 }
 
-char *wczyt(char *w, Player *player, POINT frame, struct Graphics *graphics)
+char *wczyt(char *w, Player *player, POINT frame, Graphics_t *graphics)
 {
 	FILE *wczytaj;
 	wczytaj = fopen("zapis1.txt", "rb");
@@ -332,13 +332,13 @@ char *wczyt(char *w, Player *player, POINT frame, struct Graphics *graphics)
 			switch (trans)
 			{
 			case 't':
-				*(w + i) = graphics->background;
+				*(w + i) = graphics->board.background;
 				break;
 			case 'u':
-				*(w + i) = graphics->ustawione;
+				*(w + i) = graphics->board.ustawione;
 				break;
 			case 'r':
-				*(w + i) = graphics->ramka;
+				*(w + i) = graphics->board.ramka;
 				break;
 			default:
 				*(w + i)= trans;
@@ -406,7 +406,7 @@ char *wczyt(char *w, Player *player, POINT frame, struct Graphics *graphics)
 		SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), bufferSize1);
 		system("cls");
 		printf("\aNie uda\210o si\251 za\210adowa\206 stanu gry!\nNacisnij dowolny klawisz, \276eby kontynuowa\206");
-		_getch();
+		getchar();
 		SMALL_RECT windowSize2 = { 0, 0, frame.x + 1, frame.y + 5 };
 		SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), 1, &windowSize2);
 		COORD bufferSize2 = { frame.x + 1 + 1, frame.y + 5 + 1 };
@@ -549,7 +549,7 @@ void rotate(Player *player)
 	return;
 }
 
-void komunikat(char *background, POINT	frame, char *tekst, int pX, int pY, char w, int ramka, struct Graphics *graphics)
+void komunikat(char *background, POINT	frame, char *tekst, int pX, int pY, char w, int ramka, Graphics_t *graphics)
 {
 	int iX = 0;
 	int iY = 0;
@@ -563,7 +563,7 @@ void komunikat(char *background, POINT	frame, char *tekst, int pX, int pY, char 
 		{
 			for (m=0;;m++)
 			{
-				*(background + ((frame.y / 2) + pY + t) * (frame.x + 1) + m + pX) = graphics->h;
+				*(background + ((frame.y / 2) + pY + t) * (frame.x + 1) + m + pX) = graphics->border.h;
 			}
 		}
 		for (m = 0; tekst[m]; m++)
@@ -588,29 +588,29 @@ void komunikat(char *background, POINT	frame, char *tekst, int pX, int pY, char 
 				switch (t)
 				{
 				case -1:
-					*(background + ((frame.y / 2) + pY + t) * (frame.x + 1) + (frame.x / 2) - strlen(tekst) / 2 + pX - 1) = graphics->gl;
+					*(background + ((frame.y / 2) + pY + t) * (frame.x + 1) + (frame.x / 2) - strlen(tekst) / 2 + pX - 1) = graphics->border.gl;
 					break;
 				case 0:
-					*(background + ((frame.y / 2) + pY + t) * (frame.x + 1) + (frame.x / 2) - strlen(tekst) / 2  + pX - 1) = graphics->v;
+					*(background + ((frame.y / 2) + pY + t) * (frame.x + 1) + (frame.x / 2) - strlen(tekst) / 2  + pX - 1) = graphics->border.v;
 					break;
 				case 1:
-					*(background + ((frame.y / 2) + pY + t) * (frame.x + 1) + (frame.x / 2) - strlen(tekst) / 2  + pX - 1) = graphics->dl;
+					*(background + ((frame.y / 2) + pY + t) * (frame.x + 1) + (frame.x / 2) - strlen(tekst) / 2  + pX - 1) = graphics->border.dl;
 					break;
 				}
 				for (m = 0; tekst[m]; m++)
 				{
-					*(background + ((frame.y / 2) + pY + t) * (frame.x + 1) + (frame.x / 2) - strlen(tekst) / 2 + m + pX) = graphics->h;
+					*(background + ((frame.y / 2) + pY + t) * (frame.x + 1) + (frame.x / 2) - strlen(tekst) / 2 + m + pX) = graphics->border.h;
 				}
 				switch (t)
 				{
 				case -1:
-					*(background + ((frame.y / 2) + pY + t) * (frame.x + 1) + (frame.x / 2) - strlen(tekst) / 2 + m + pX ) = graphics->gp;
+					*(background + ((frame.y / 2) + pY + t) * (frame.x + 1) + (frame.x / 2) - strlen(tekst) / 2 + m + pX ) = graphics->border.gp;
 					break;
 				case 0:
-					*(background + ((frame.y / 2) + pY + t) * (frame.x + 1) + (frame.x / 2) - strlen(tekst) / 2 + m + pX ) = graphics->v;
+					*(background + ((frame.y / 2) + pY + t) * (frame.x + 1) + (frame.x / 2) - strlen(tekst) / 2 + m + pX ) = graphics->border.v;
 					break;
 				case 1:
-					*(background + ((frame.y / 2) + pY + t) * (frame.x + 1) + (frame.x / 2) - strlen(tekst) / 2 + m + pX ) = graphics->dp;
+					*(background + ((frame.y / 2) + pY + t) * (frame.x + 1) + (frame.x / 2) - strlen(tekst) / 2 + m + pX ) = graphics->border.dp;
 					break;
 				}
 			}
@@ -623,18 +623,18 @@ void komunikat(char *background, POINT	frame, char *tekst, int pX, int pY, char 
 	}
 }
 
-int down(struct Board *board, Player *player, int timePopr, Wynik **tWynikow, struct Graphics *graphics)
+int down(Board_t *board, Player *player, int timePopr, Wynik **tWynikow, Graphics_t *graphics)
 {
-	if (collision_check(board->mapB, player, board->frame, graphics->background, 'D')) player->poss.y++;
+	if (collision_check(board->mapB, player, board->frame, graphics->board.background, 'D')) player->poss.y++;
 	else
 	{
 		int stack = 0;
 		int t = 1;
 		char m = 1;
-		board->mapB[(player->poss.y + player->shape[0].y) * (board->frame.x + 1) + player->poss.x + player->shape[0].x] = graphics->ustawione;
-		board->mapB[(player->poss.y + player->shape[1].y) * (board->frame.x + 1) + player->poss.x + player->shape[1].x] = graphics->ustawione;
-		board->mapB[(player->poss.y + player->shape[2].y) * (board->frame.x + 1) + player->poss.x + player->shape[2].x] = graphics->ustawione;
-		board->mapB[(player->poss.y + player->shape[3].y) * (board->frame.x + 1) + player->poss.x + player->shape[3].x] = graphics->ustawione;
+		board->mapB[(player->poss.y + player->shape[0].y) * (board->frame.x + 1) + player->poss.x + player->shape[0].x] = graphics->board.ustawione;
+		board->mapB[(player->poss.y + player->shape[1].y) * (board->frame.x + 1) + player->poss.x + player->shape[1].x] = graphics->board.ustawione;
+		board->mapB[(player->poss.y + player->shape[2].y) * (board->frame.x + 1) + player->poss.x + player->shape[2].x] = graphics->board.ustawione;
+		board->mapB[(player->poss.y + player->shape[3].y) * (board->frame.x + 1) + player->poss.x + player->shape[3].x] = graphics->board.ustawione;
 		POINT primary;
 		int xc;
 		int yc;
@@ -642,19 +642,19 @@ int down(struct Board *board, Player *player, int timePopr, Wynik **tWynikow, st
 		{
 			for (primary.x = 1; primary.x <= board->frame.y - 1; ++primary.x)
 			{
-				if (board->mapB[primary.y * (board->frame.x + 1) + primary.x] == graphics->background) break;
+				if (board->mapB[primary.y * (board->frame.x + 1) + primary.x] == graphics->board.background) break;
 				else if (primary.x == board->frame.x - 1)
 				{
 					for (xc = 1; xc <= board->frame.x - 2; ++xc)
 					{
-						board->mapB[primary.y * (board->frame.x + 1) + xc] = graphics->background;
+						board->mapB[primary.y * (board->frame.x + 1) + xc] = graphics->board.background;
 					}
 					for (yc = primary.y; yc>0; --yc)
 					{
 						for (xc = 1; xc <= board->frame.x - 2; ++xc)
 						{
 							if (yc>1) board->mapB[yc * (board->frame.x + 1) + xc] = board->mapB[(yc - 1) * (board->frame.x + 1) + xc];
-							else board->mapB[yc * (board->frame.x + 1) + xc] = graphics->background;
+							else board->mapB[yc * (board->frame.x + 1) + xc] = graphics->board.background;
 						}
 					}
 					stack++;
@@ -666,7 +666,7 @@ int down(struct Board *board, Player *player, int timePopr, Wynik **tWynikow, st
 		player->poss.x = board->frame.x / 2;
 		player->poss.y = 2;
 		random_Block(player);
-		if (!collision_check(board->mapB, player, board->frame, graphics->background, 'O'))
+		if (!collision_check(board->mapB, player, board->frame, graphics->board.background, 'O'))
 		{
 			Wynik wynik;
 			wynik.wynik = player->points;
@@ -678,7 +678,7 @@ int down(struct Board *board, Player *player, int timePopr, Wynik **tWynikow, st
 			if(!board->custom)wynikiPrownaj(&wynik, tWynikow);
 			printf("\nWci\230nij Enter aby wr\242ci\206 do menu...");
 			char znak;
-			do { znak = _getch(); } while (znak != 13);
+			do { znak = getchar(); } while (znak != 13);
 			return 0;
 		}
 
@@ -686,9 +686,9 @@ int down(struct Board *board, Player *player, int timePopr, Wynik **tWynikow, st
 	return 1;
 }
 
-void gra(Wynik **tWynikow, struct Sterowanie *ster, struct Graphics *graphics)
+void gra(Wynik **tWynikow, struct Sterowanie *ster, Graphics_t *graphics)
 {	
-	Board board;
+	Board_t board;
 	_Board_Initilaze(&board);
 	board.frame.x = 16;
 	board.frame.y = 18;
@@ -710,15 +710,15 @@ void gra(Wynik **tWynikow, struct Sterowanie *ster, struct Graphics *graphics)
 			}
 		}
 		ster->Process_Input(ster);
-		if (ster->direction.right.isRising && collision_check(board.mapB, &player, board.frame, graphics->background, 'P'))
+		if (ster->direction.right.isRising && collision_check(board.mapB, &player, board.frame, graphics->board.background, 'P'))
 		{
 			player.poss.x++;
 		}
-		if (ster->direction.left.isRising && collision_check(board.mapB, &player, board.frame, graphics->background, 'L'))
+		if (ster->direction.left.isRising && collision_check(board.mapB, &player, board.frame, graphics->board.background, 'L'))
 		{
 			player.poss.x--;
 		}
-		if (ster->direction.up.isRising && collision_check(board.mapB, &player, board.frame, graphics->background, 'R'))
+		if (ster->direction.up.isRising && collision_check(board.mapB, &player, board.frame, graphics->board.background, 'R'))
 		{
 			//player.poss[1]--;
 			rotate(&player);
@@ -747,7 +747,7 @@ void gra(Wynik **tWynikow, struct Sterowanie *ster, struct Graphics *graphics)
 			pauza = (clock() / (CLOCKS_PER_SEC));
 			komunikat(board.map, board.frame, "Pauza", 0, 0, 'S', 1, graphics);
 			draw(board.map);
-			_getch();
+			getchar();
 			timePopr += (clock() / (CLOCKS_PER_SEC)) - pauza;
 		}
 		if (ster->nowy.isRising)
@@ -769,7 +769,7 @@ void gra(Wynik **tWynikow, struct Sterowanie *ster, struct Graphics *graphics)
 					board.Shutdown(&board);
 					return;
 				}
-				key = _getch();
+				key = getchar();
 			} while (key != 'n');
 			timePopr += (clock() / (CLOCKS_PER_SEC)) - pauza;
 		}

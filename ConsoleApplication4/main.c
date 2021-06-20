@@ -1,5 +1,5 @@
 #include "biblioteki.h"
-
+#include "gra.h"
 
 typedef struct Wynik Wynik;
 
@@ -32,11 +32,11 @@ int main()
 	while (1)
 	{
 		ilosc = 0;
-		system("cls");
-		printf("%c%d.Gra%c\n", graphics.lewy * !(kursor.pozycja - ilosc), ilosc + 1, graphics.prawy * !(kursor.pozycja - ilosc)); ilosc++;
-		printf("%c%d.Opcje%c\n", graphics.lewy * !(kursor.pozycja - ilosc), ilosc + 1, graphics.prawy * !(kursor.pozycja - ilosc)); ilosc++;
-		printf("%c%d.Wyniki%c\n", graphics.lewy * !(kursor.pozycja - ilosc), ilosc + 1, graphics.prawy * !(kursor.pozycja - ilosc)); ilosc++;
-		switch (_getch())
+		system("clear");
+		printf("%c%d.Gra%c\n", graphics.chars.lewy * !(kursor.pozycja - ilosc), ilosc + 1, graphics.chars.prawy * !(kursor.pozycja - ilosc)); ilosc++;
+		printf("%c%d.Opcje%c\n", graphics.chars.lewy * !(kursor.pozycja - ilosc), ilosc + 1, graphics.chars.prawy * !(kursor.pozycja - ilosc)); ilosc++;
+		printf("%c%d.Wyniki%c\n", graphics.chars.lewy * !(kursor.pozycja - ilosc), ilosc + 1, graphics.chars.prawy * !(kursor.pozycja - ilosc)); ilosc++;
+		switch (getchar())
 		{
 		case 27:
 			exit(0);
@@ -44,7 +44,7 @@ int main()
 
 		case KEY_INPUT:
 
-			switch (_getch())
+			switch (getchar())
 			{
 			case 72:
 				if (kursor.pozycja > 0)
@@ -104,87 +104,3 @@ int main()
 	}
 	return 0;
 }
-
-//polskie znaki
-/*
-206 - æ c
-210 - ³ l
-230 - œ s
-242 - ó o
-245 - ¹ a 
-251 - ê e
-253 - Ÿ z'
-276 - ¿ z
-344 - ñ n
-*/
-
-//kopia zapasowa void gra()
-/*
-void gra()
-{
-	struct Player player;
-	player.poss[0] = 1;
-	player.poss[1] = 1;
-
-	int xy[2] = { 12, 12 };
-	char *mapB;
-	char *map;
-	map = createMap(xy[0], xy[1], xy, &player);
-	mapB = malloc(strlen(map));
-	strcpy(mapB, map);
-	int time = 0;
-
-	while (1)
-	{
-		if (_kbhit())
-		{
-			char buf = _getch();
-			switch (buf)
-			{
-			case 224:
-				buf = _getch();
-			default:
-				if (buf == controls.wPrawo &&		map[player.poss[1] * (xy[1] + 1) + player.poss[0] + 1] != sciana)
-				{
-					player.poss[0]++;
-				}
-				else if (buf == controls.wLewo &&	map[player.poss[1] * (xy[1] + 1) + player.poss[0] - 1] != sciana)
-				{
-					player.poss[0]--;
-				}
-				else if (buf == controls.wGore &&	map[(player.poss[1] - 1) * (xy[1] + 1) + player.poss[0]] != sciana)
-				{
-					player.poss[1]--;
-				}
-				else if (buf == controls.wDol &&	map[(player.poss[1] + 1) * (xy[1] + 1) + player.poss[0]] != sciana)
-				{
-					player.poss[1]++;
-				}
-				break;
-
-			case 27:
-				return;
-
-			case 'z':
-				zapis(map, &player, xy);
-				break;
-
-			case 'w':
-				map = wczyt(map, &player, xy);
-				break;
-
-			case 'n':
-
-				map = createMap(10, 10, xy, &player);
-				break;
-			}
-		}
-		strcpy(map, mapB);
-		*(map + player.poss[1] * (xy[0] + 1) + player.poss[0]) = '@';
-		draw(map);
-		time = clock() / (CLOCKS_PER_SEC);
-		printf("Czas: %ds\nESC aby wyjsc", time, xy[0], xy[1]);
-		Sleep(50);
-	}
-	return;
-}*/

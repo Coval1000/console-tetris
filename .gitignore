@@ -41,6 +41,7 @@ VkEngine
 Debug
 Release
 x64
+build
 .vscode
 .vs
 *.db

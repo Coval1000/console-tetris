@@ -28,18 +28,18 @@
 			{
 				(*wynik).imie[i] = 0;
 				i--;
-				_putch(8);
-				_putch(' ');
-				_putch(8);
+				putchar(8);
+				putchar(' ');
+				putchar(8);
 			}
 			else if (b != 8 && i < 14)
 			{
 				(*wynik).imie[i] = b;
 				i++;
 				(*wynik).imie[i] = 0;
-				_putch((*wynik).imie[i - 1]);
+				putchar((*wynik).imie[i - 1]);
 			}
-		} while ((b = _getch()) != 13);
+		} while ((b = getchar()) != 13);
 	}
 
 	Wynik *wynikiDodaj(Wynik *tWynikow)
@@ -140,7 +140,7 @@
 		if ((*wynik).wynik > (*tWynikow)[lWynikow - 1].wynik)
 		{
 			if (!*tWynikow || lWynikow < 10) *tWynikow = wynikiDodaj(*tWynikow);
-			int p = lWynikow - 1;//NIE U¯YWAæ FOR(;;) - siedlisko patologii!!!
+			int p = lWynikow - 1;//NIE Uï¿½YWAï¿½ FOR(;;) - siedlisko patologii!!!
 			while (p >= 0 && (*wynik).wynik >(*tWynikow)[p].wynik)
 			{
 				if (p < lWynikow - 1)
@@ -182,14 +182,14 @@
 		for (pozycja = 0; pozycja<lWynikow; pozycja++)
 		{
 			printf("%d.", pozycja + 1);
-			for (l = 2 - logT(pozycja+1); l >= 0; l--)_putch(' ');
+			for (l = 2 - logT(pozycja+1); l >= 0; l--)putchar(' ');
 			printf("%s", tWynikow[pozycja].imie);
-			for (l = 15 - strlen(tWynikow[pozycja].imie) + b - logT((int)tWynikow[pozycja].wynik); l >= 0; l--)_putch('.');
+			for (l = 15 - strlen(tWynikow[pozycja].imie) + b - logT((int)tWynikow[pozycja].wynik); l >= 0; l--)putchar('.');
 			printf("%.fp", tWynikow[pozycja].wynik);			
-			for (l = 10 - b - logT(tWynikow[pozycja].czasGry / 60); l >= 0; l--)_putch(' ');
+			for (l = 10 - b - logT(tWynikow[pozycja].czasGry / 60); l >= 0; l--)putchar(' ');
 			printf("%dmin %s%ds\n",tWynikow[pozycja].czasGry / 60, (tWynikow[pozycja].czasGry % 60) < 10 ? "0" : "" , tWynikow[pozycja].czasGry % 60);
 		}
-		_getch();
+		getchar();
 	}
 
 
