@@ -3,33 +3,19 @@
 #include <time.h>
 #include <stdio.h>
 #include "wynik.h"
+#include "graphics/draw.h"
 
-void _Player_Default(struct Player *self, POINT frame)
+void _Player_Default(Player_t *self, POINT frame)
 {
-	self->poss.x = frame.x / 2 - 2;
-	self->poss.y = 2;
-	self->speed = 1;
-	self->points = 0;
-	self->time = 0;
-	return;
-}
-
-void gotoxy(int x, int y)
-{
-    COORD coord;
-    coord.X = x;
-    coord.Y = y;
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-}
-
-void draw(char *d)
-{	
-    gotoxy(0, 0);
-    puts(d);
+    self->poss.x = frame.x / 2 - 2;
+    self->poss.y = 2;
+    self->speed = 1;
+    self->points = 0;
+    self->time = 0;
     return;
 }
 
-void _Board_Print(Board_t *self, struct Player *player, Graphics_t *graphics)
+void _Board_Print(Board_t *self, Player_t *player, Graphics_t *graphics)
 {
     strcpy(self->map, self->mapB);
     self->map[(player->poss.y + player->shape[0].y) * (self->frame.x + 1) + player->poss.x + player->shape[0].x] = graphics->board.kursor;
@@ -59,12 +45,7 @@ bool _Board_CreateMap(Board_t *self, Graphics_t *graphics)
     if (tmp)
     {
         self->map = (char*)tmp;
-        COORD tmpsize = { 260, 300 };
-        SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), tmpsize);
-        COORD bufferSize = { self->frame.x + 2, self->frame.y + 6 };
-        SMALL_RECT konsola = { 0, 0, self->frame.x + 1, self->frame.y + 5 };
-        SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), 1, &konsola);
-        SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), bufferSize);
+        setConsoleSize(self->frame.x + 2, self->frame.y + 6);
         int i = 0;
         int w = 0;
         for (; i < self->frame.x; ++i)
@@ -87,7 +68,7 @@ bool _Board_CreateMap(Board_t *self, Graphics_t *graphics)
         }
         self->map[i] = '\n';
         self->map[++i] = '\0';
-        system("cls");
+        clearConsole();
         self->mapB = (char*)malloc(strlen(self->map) + 1);
         strcpy(self->mapB, self->map);
         return true;
@@ -96,7 +77,7 @@ bool _Board_CreateMap(Board_t *self, Graphics_t *graphics)
     return false;
 }
 
-bool _Board_CustomMap(Board_t *self, struct Player *player, Graphics_t *graphics)
+bool _Board_CustomMap(Board_t *self, Player_t *player, Graphics_t *graphics)
 {
     struct Kursor kursor;
     struct Sterowanie controls;
@@ -106,16 +87,11 @@ bool _Board_CustomMap(Board_t *self, struct Player *player, Graphics_t *graphics
     unsigned char y = 0;
     int ilosc;
     int value;
-    COORD tmpsize = { 260, 300 };
-    SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), tmpsize);
-    COORD bufferSize = { 35, 21 };
-    SMALL_RECT konsola = { 0, 0, 34 , 20 };
-    SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), 1, &konsola);
-    SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), bufferSize);
+    setConsoleSize(35, 21);
     for (; !controls.utilities.enter.isDown; controls.Process_Input(&controls))
     {
 
-        system("clear");
+        clearConsole();
         printf("Wynik_t gry niestandardowej nie jest zapisywany na tablicy wynik\242w.\n UWAGA! okno konsoli nie mo\276e by\206 \nwi\251ksze ni\276 ekran. Powoduje to \nb\210\251de wy\230wietlanie zbyt du\276ych map\n\n");
         ilosc = 0;
         printf("%cX: %d\n", graphics->chars.lewy * !(kursor.pozycja - ilosc), x); ilosc++;
@@ -188,7 +164,7 @@ bool _Board_CustomMap(Board_t *self, struct Player *player, Graphics_t *graphics
         }
         if (controls.direction.up.isRising && kursor.pozycja > 0) kursor.pozycja--;
         if (controls.direction.down.isRising && kursor.pozycja < ilosc - 1) kursor.pozycja++;
-    }	
+    }
     if (!x || !y)
     {
         self->Shutdown(self);
@@ -234,7 +210,7 @@ int sumaC(int a, int b)
     return a + sumaC(a + a, b - 1);
 }
 
-void zapis(char *w, Player *player, POINT frame, Graphics_t *graphics)
+void zapis(char *w, Player_t *player, POINT frame, Graphics_t *graphics)
 {
     int i = 0;
     char trans = 0;
@@ -255,9 +231,9 @@ void zapis(char *w, Player *player, POINT frame, Graphics_t *graphics)
 
     putc(player->poss.x, zapisz);
     putc(player->poss.y, zapisz);
-    for (i = 0; i < 4; i++) 
-    { 
-        putc(player->shape[i].x, zapisz); 
+    for (i = 0; i < 4; i++)
+    {
+        putc(player->shape[i].x, zapisz);
         putc(player->shape[i].y, zapisz);
     }
 
@@ -276,7 +252,7 @@ void zapis(char *w, Player *player, POINT frame, Graphics_t *graphics)
     return;
 }
 
-char *wczyt(char *w, Player *player, POINT frame, Graphics_t *graphics)
+char *wczyt(char *w, Player_t *player, POINT frame, Graphics_t *graphics)
 {
     FILE *wczytaj;
     wczytaj = fopen("zapis1.txt", "rb");
@@ -294,7 +270,7 @@ char *wczyt(char *w, Player *player, POINT frame, Graphics_t *graphics)
         }
         else
         {
-            system("cls");
+            clearConsole();
             printf("\aB\210ad pami\251ci");
             return w;
         }
@@ -371,30 +347,21 @@ char *wczyt(char *w, Player *player, POINT frame, Graphics_t *graphics)
             }
             else i++;
         }
-        SMALL_RECT windowSize = { 0, 0, frame.x + 1, frame.y + 5 };
-        SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), 1, &windowSize);
-        COORD bufferSize = { frame.x + 1 + 1, frame.y + 5 + 1 };
-        SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), bufferSize);
+        setConsoleSize(frame.x + 2, frame.y + 6);
         fclose(wczytaj);
     }
     else
     {
-        SMALL_RECT windowSize1 = { 0, 0, 45, 20 };
-        SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), 1, &windowSize1);
-        COORD bufferSize1 = { 46, 21 };
-        SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), bufferSize1);
-        system("cls");
+        setConsoleSize(46, 21);
+        clearConsole();
         printf("\aNie uda\210o si\251 za\210adowa\206 stanu gry!\nNacisnij dowolny klawisz, \276eby kontynuowa\206");
         getchar();
-        SMALL_RECT windowSize2 = { 0, 0, frame.x + 1, frame.y + 5 };
-        SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), 1, &windowSize2);
-        COORD bufferSize2 = { frame.x + 1 + 1, frame.y + 5 + 1 };
-        SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), bufferSize2);
+        setConsoleSize(frame.x + 2, frame.y + 6 );
     }
     return w;
 }
 
-int collision_check(char *map, Player *player, POINT frame, char object, char kierunek)
+int collision_check(char *map, Player_t *player, POINT frame, char object, char kierunek)
 {
     switch (kierunek)
     {
@@ -438,7 +405,7 @@ int collision_check(char *map, Player *player, POINT frame, char object, char ki
     return -1;
 }
 
-void random_Block(Player *player)
+void random_Block(Player_t *player)
 {
     srand(time(NULL));
     switch (rand() % 7)
@@ -516,7 +483,7 @@ void random_Block(Player *player)
     }
 }
 
-void rotate(Player *player)
+void rotate(Player_t *player)
 {
     int i, a;
     for (i = 0; i < 4; ++i)
@@ -550,7 +517,7 @@ void komunikat(char *background, POINT	frame, char *tekst, int pX, int pY, char 
             *(background + ((frame.y / 2) + pY) * (frame.x + 1) + m + pX) = tekst[m];
         }
         break;
-    
+
 
     case 'P':
         for (m = 0; tekst[m]; m++)
@@ -602,7 +569,7 @@ void komunikat(char *background, POINT	frame, char *tekst, int pX, int pY, char 
     }
 }
 
-int down(Board_t *board, Player *player, int timePopr, Wynik_t **tWynikow, Graphics_t *graphics)
+int down(Board_t *board, Player_t *player, int timePopr, Wynik_t **tWynikow, Graphics_t *graphics)
 {
     if (collision_check(board->mapB, player, board->frame, graphics->board.background, 'D')) player->poss.y++;
     else
@@ -652,7 +619,7 @@ int down(Board_t *board, Player *player, int timePopr, Wynik_t **tWynikow, Graph
             wynik.czasGry = (clock() / (CLOCKS_PER_SEC)) - timePopr;
             char *tekst = { "Koniec gry!" };
             komunikat(board->mapB, board->frame, "Koniec gry!", 0, 0, 'S',1, graphics);
-            system("cls");
+            clearConsole();
             draw(board->mapB);
             if(!board->custom)wynikiPrownaj(&wynik, tWynikow);
             printf("\nWci\230nij Enter aby wr\242ci\206 do menu...");
@@ -666,13 +633,13 @@ int down(Board_t *board, Player *player, int timePopr, Wynik_t **tWynikow, Graph
 }
 
 void gra(Wynik_t **tWynikow, struct Sterowanie *ster, Graphics_t *graphics)
-{	
+{
     Board_t board;
     _Board_Initilaze(&board);
     board.frame.x = 16;
     board.frame.y = 18;
     board.CreateMap(&board, graphics);
-    Player player;
+    Player_t player;
     _Player_Default(&player, board.frame);
     random_Block(&player);
     int timePopr = clock() / (CLOCKS_PER_SEC);

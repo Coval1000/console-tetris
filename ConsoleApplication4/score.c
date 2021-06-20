@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <windows.h>
+#include "graphics/draw.h"
 
 int lWynikow = 0;
 
@@ -47,7 +48,7 @@ Wynik_t *wynikiDodaj(Wynik_t *tWynikow)
     }
     else
     {
-        system("cls");
+        clearConsole();
         printf("\aB\210ad pami\251ci");
         exit(10);
     }
@@ -162,17 +163,12 @@ int wynikiPrownaj(Wynik_t *wynik, Wynik_t **tWynikow)
 
 void wyniki(Wynik_t *tWynikow)
 {
-    SMALL_RECT windowSize = { 0, 0, 50, 20 };
-    COORD bufferSize = { 51, 21 };
-    COORD tmpsize = { 80, 300 };
-    SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), tmpsize);
-    SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), 1, &windowSize);
-    SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), bufferSize);
+    setConsoleSize(51, 21);
 
     int pozycja = 0;
     int l;
     int b = logT((int)tWynikow[pozycja].wynik);
-    system("cls");
+    clearConsole();
     printf("Wyniki\n\n");
     for (pozycja = 0; pozycja<lWynikow; pozycja++)
     {

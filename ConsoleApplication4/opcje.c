@@ -4,6 +4,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include "graphics/draw.h"
 
 void _Process_Key(struct Key *self)
 {
@@ -315,13 +316,7 @@ char *znakS(char lit)
 
 char wyglad(char znak)
 {
-    COORD tmpsize = { 80, 300 };
-    SMALL_RECT windowSize = { 0, 0, 33, 34 };
-    COORD bufferSize = { 34, 35 };
-
-    SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), tmpsize);
-    SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), 1, &windowSize);
-    SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), bufferSize);
+    setConsoleSize(34, 35);
 
     int x = absZnak(znak) % 16;
     int y = absZnak(znak) / 16;
@@ -367,7 +362,7 @@ char wyglad(char znak)
 
     plansza[sizeY * 2 * 34 + sizeX] = '\n';
     plansza[sizeY * 2 * 34 + sizeX + 1] = '\0';
-    system("clear");
+    clearConsole();
 
     while (1)
     {
@@ -433,13 +428,7 @@ char przypisz(char *key)
 
 void opcje(struct Sterowanie *ster, struct Graphics *graphics)
 {
-    COORD tmpsize = { 80, 300 };
-    SMALL_RECT windowSize = { 0, 0, 40, 20 };
-    COORD bufferSize = { 41, 21 };
-
-    SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), tmpsize);
-    SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), 1, &windowSize);
-    SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), bufferSize);
+    setConsoleSize(41, 21);
 
     struct Kursor opcje;
     opcje.pozycja = 0;
@@ -449,7 +438,7 @@ void opcje(struct Sterowanie *ster, struct Graphics *graphics)
     {
 
         ilosc = 0;
-        system("clear");
+        clearConsole();
         printf("Sterowanie\n\n");
         printf("%cPrzesu\344 w g\242r\251  : %s%c\n", graphics->chars.lewy * !(opcje.pozycja - ilosc), znakS(ster->direction.up.code), graphics->chars.prawy * !(opcje.pozycja - ilosc));	ilosc++;
         printf("%cPrzesu\344 w d\242\210   : %s%c\n", graphics->chars.lewy * !(opcje.pozycja - ilosc), znakS(ster->direction.down.code), graphics->chars.prawy * !(opcje.pozycja - ilosc));	ilosc++;
@@ -525,9 +514,7 @@ void opcje(struct Sterowanie *ster, struct Graphics *graphics)
                 return;
                 break;
             }
-            SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), tmpsize);
-            SetConsoleWindowInfo(GetStdHandle(STD_OUTPUT_HANDLE), 1, &windowSize);
-            SetConsoleScreenBufferSize(GetStdHandle(STD_OUTPUT_HANDLE), bufferSize);
+            setConsoleSize(41, 21);
         }
     }
     return;
