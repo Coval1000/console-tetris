@@ -58,3 +58,4 @@ build
 ipch
 *.aps
 *.reg
+compile_commands.json
