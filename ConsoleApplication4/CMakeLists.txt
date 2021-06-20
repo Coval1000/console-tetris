@@ -1,4 +1,4 @@
-set(SOURCES main.c opcje.c)
+set(SOURCES main.c opcje.c game.c score.c)
 
 add_executable(${PROJECT} ${SOURCES})
 

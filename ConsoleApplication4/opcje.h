@@ -133,3 +133,4 @@ char przypisz(char *key);
 
 void opcje(struct Sterowanie *ster, Graphics_t *graphics);
 
+int kbhit(void);

@@ -1,7 +1,6 @@
-#include "biblioteki.h"
+#include <stdio.h>
 #include "gra.h"
-
-typedef struct Wynik Wynik;
+#include "wynik.h"
 
 int main()
 {
@@ -18,8 +17,8 @@ int main()
 	struct Graphics graphics;
 	_Graphics_Initialize(&graphics);
 
-	struct Wynik *tWynikow;
-	tWynikow = malloc(sizeof(Wynik));
+	Wynik_t *tWynikow;
+	tWynikow = malloc(sizeof(Wynik_t));
 	tWynikow = wynikiWczyt(tWynikow);
 
 	struct Kursor kursor;
