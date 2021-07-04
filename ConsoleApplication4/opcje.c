@@ -5,130 +5,15 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "graphics/draw.h"
+#include "input/keys.h"
 
-void _Process_Key(struct Key *self)
-{
-    BOOL result = GetAsyncKeyState(self->code) & 0x8000;
-    if (result)
-    {		
-        if (self->isDown) self->isRising = FALSE;
-        else self->isRising = TRUE;
-        self->isFalling = FALSE;
-        self->isDown = TRUE;
-    }
-    else
-    {
-        if (self->isDown) self->isFalling = TRUE;
-        else self->isFalling = FALSE;
-        self->isRising = FALSE;
-        self->isDown = FALSE;
-    }
-    return;
-}
-
-void _Key_Initialize(struct Key *self, char code)
-{
-    self->code = code;
-    self->isDown = FALSE;
-    self->isFalling = FALSE;
-    self->isRising = FALSE;
-    self->ProcessKey = &_Process_Key;
-}
-
-void _NumKeys_Default(struct NumKeys *self)
-{
-    _Key_Initialize(&self->num0, '0');
-    _Key_Initialize(&self->num1, '1');
-    _Key_Initialize(&self->num2, '2');
-    _Key_Initialize(&self->num3, '3');
-    _Key_Initialize(&self->num4, '4');
-    _Key_Initialize(&self->num5, '5');
-    _Key_Initialize(&self->num6, '6');
-    _Key_Initialize(&self->num7, '7');
-    _Key_Initialize(&self->num8, '8');
-    _Key_Initialize(&self->num9, '9');
-    return;
-}
-
-void _NumKeys_ProcessInput(struct NumKeys *self)
-{
-    _Process_Key(&self->num0);
-    _Process_Key(&self->num1);
-    _Process_Key(&self->num2);
-    _Process_Key(&self->num3);
-    _Process_Key(&self->num4);
-    _Process_Key(&self->num5);
-    _Process_Key(&self->num6);
-    _Process_Key(&self->num7);
-    _Process_Key(&self->num8);
-    _Process_Key(&self->num9);
-    return;
-}
-
-void _NumKeys_Initialize(struct NumKeys *self)
-{
-    self->Process_Input = &_NumKeys_ProcessInput;
-    self->Default = &_NumKeys_Default;
-    _NumKeys_Default(self);
-    return;
-}
-
-void _DirectionKeys_Default(struct DirectionKeys *self)
-{
-    _Key_Initialize(&self->up, VK_UP);
-    _Key_Initialize(&self->down, VK_DOWN);
-    _Key_Initialize(&self->left, VK_LEFT);
-    _Key_Initialize(&self->right, VK_RIGHT);
-    return;
-}
-
-void _DirectionKeys_ProcessInput(struct DirectionKeys *self)
-{
-    _Process_Key(&self->down);
-    _Process_Key(&self->up);
-    _Process_Key(&self->left);
-    _Process_Key(&self->right);
-    return;
-}
-
-void _DirectionKeys_Initialize(struct DirectionKeys *self)
-{
-    self->Process_Input = &_DirectionKeys_ProcessInput;
-    self->Default = &_DirectionKeys_Default;
-    _DirectionKeys_Default(self);
-    return;
-}
-
-void _UtilityKeys_Default(struct UtilityKeys *self)
-{
-    _Key_Initialize(&self->esc, VK_ESCAPE);
-    _Key_Initialize(&self->enter, VK_RETURN);
-    _Key_Initialize(&self->backspace, VK_BACK);
-    return;
-}
-
-void _UtilityKeys_ProcessInput(struct UtilityKeys *self)
-{
-    _Process_Key(&self->esc);
-    _Process_Key(&self->enter);
-    _Process_Key(&self->backspace);
-    return;
-}
-
-void _UtilityKeys_Initialize(struct UtilityKeys *self)
-{
-    self->Process_Input = &_UtilityKeys_ProcessInput;
-    self->Default = &_UtilityKeys_Default;
-    _UtilityKeys_Default(self);
-    return;
-}
 
 void _Sterowanie_Default(struct Sterowanie *self)
 {
-    _Key_Initialize(&self->zapis, VK_F1);
-    _Key_Initialize(&self->wczytanie, VK_F2);
-    _Key_Initialize(&self->pauza, VK_SPACE);
-    _Key_Initialize(&self->nowy, 'N');
+    key_init(&self->zapis, VK_F1);
+    key_init(&self->wczytanie, VK_F2);
+    key_init(&self->pauza, VK_SPACE);
+    key_init(&self->nowy, 'N');
     return;
 }
 
@@ -182,6 +67,7 @@ void _Plansza(struct Plansza *self)
 	self->background = -80;
 	self->kursor = '@';
 	self->ustawione = -79;
+    return;
 }
 
 int absZnak(int a)
